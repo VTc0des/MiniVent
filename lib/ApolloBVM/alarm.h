@@ -39,7 +39,7 @@ public:
 
   void addAlarm(int idx, const Alarm &a);
   void addAlarm(int idx, AlarmFunc condition, String text);
-  Alarm *evaluate();
+  Alarm *evaluate(); //returns a pointer
 
 private:
   // Ventilator IO reference.
