@@ -5,7 +5,7 @@
 #include "buttonmanager.h"
 #include "pins.h"
 #include "constants.h"
-#include <LiquidCrystal.h>
+#include "alarmdisplay.h"
 
 typedef struct {
   bool ihold; //stores ihold button state on master controller

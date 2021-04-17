@@ -8,17 +8,40 @@ AlarmDisplay::AlarmDisplay(uint8_t rs, uint8_t enable,
 
 void AlarmDisplay::start(){
     _lcd->begin(_cols, _rows); //pointer will populate memory address of _lcd
-
-    _lcd->clear();
     setBacklight(0,128,128); //set blue-green color for display
-    for (int i = 0; i < 3; i++)
-    {
-        _lcd->setCursor(0, i+1);
-        _lcd->print("Test");
-    }
+
+    _lcd->setCursor(0,1);
+    _lcd->print("PIP =  ");
+
+    _lcd->setCursor(0,2);
+    _lcd->print("PEEP = ");
+
+    _lcd->setCursor(0,3);
+    _lcd->print("PP =   ");
+}
+
+void AlarmDisplay::update(float pip, float peep, float pp){
+    _pip = pip;
+    _peep = peep;
+    _pp = pp;
+    //use update to write new values while headers remain the same. 
+    //_lcd->clear();
     
-    delay(20000); //display for 2 seconds
-    _lcd->clear();
+    // for (int i = 0; i < 4; i++)
+    // {
+    //     _lcd->setCursor(8, i);
+    //     _lcd->print();
+    // }
+    
+    //_lcd->clear();
+    _lcd->setCursor(8, 1);
+    _lcd->print(_pip);
+
+    _lcd->setCursor(8, 2);
+    _lcd->print(_peep);
+
+    _lcd->setCursor(8, 3);
+    _lcd->print(_pp);
 }
 
 void AlarmDisplay::setBacklight(uint8_t r, uint8_t g, uint8_t b)

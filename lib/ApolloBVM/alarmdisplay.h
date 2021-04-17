@@ -10,7 +10,7 @@ class AlarmDisplay {
 		uint8_t d0, uint8_t d1, uint8_t d2, uint8_t d3, int red, int green, int blue);
 
         void start ();
-        void update ();
+        void update (float pip, float peep, float pp);
         void startIHold ();
         void setBacklight(uint8_t r, uint8_t g, uint8_t b);
 
