@@ -2,7 +2,7 @@
 
 ### Rice University Oshman Engineering Design Kitchen
 
-###### Author: Thomas Herring
+###### Author: Varsha Thomas, Thomas Herring
 
 ![Build Status](https://travis-ci.com/apollobvm/apollobvm_pio.svg?token=yNiqGT423d2fSsg9ELix&branch=master)
 
