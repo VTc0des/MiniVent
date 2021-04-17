@@ -1,0 +1,5 @@
+.pio
+.ccls*
+.clang*
+.gcc*
+compile_commands.*
