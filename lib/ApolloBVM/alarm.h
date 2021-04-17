@@ -1,3 +1,6 @@
+#ifndef alarm_h
+#define alarm_h
+
 #include "alarmproperties.h"
 
 using AlarmFunc = bool (*)(AlarmIO &aio);
@@ -13,7 +16,7 @@ public:
 
   // Populating constructor.
   Alarm(AlarmFunc condition, String text = "alarm")
-      : condition(condition), text(text) {}
+      : condition(condition), text(text){};
 
   // Lambda function evaluating to true when alarm is triggered.
   AlarmFunc condition;
@@ -29,18 +32,18 @@ public:
 class AlarmManager {
 
 public:
-  AlarmManager(AlarmIO &vio, int num_alarms)
-      : _vio(vio), _alarms_len(num_alarms), _prev_time(0) {
+  AlarmManager(AlarmIO &aio, int num_alarms)
+      : _aio(aio), _alarms_len(num_alarms), _prev_time(0) {
     _alarms = new Alarm[num_alarms];
-  }
+  };
 
   void addAlarm(int idx, const Alarm &a);
   void addAlarm(int idx, AlarmFunc condition, String text);
-  Alarm &evaluate();
+  Alarm *evaluate();
 
 private:
   // Ventilator IO reference.
-  AlarmIO &aio;
+  AlarmIO &_aio;
 
   // Array of alarms to evaluate.
   Alarm *_alarms;
@@ -63,3 +66,5 @@ private:
   // Previous time alarm manager was run.
   int _prev_time;
 };
+
+#endif

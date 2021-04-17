@@ -6,7 +6,7 @@ void AlarmManager::addAlarm(int idx, AlarmFunc condition, String text) {
   _alarms[idx] = Alarm(condition, text);
 }
 
-Alarm &AlarmManager::evaluate() {
+Alarm *AlarmManager::evaluate() {
 
   /* int delta_time = millis() - _prev_time; */
   /* _prev_time = millis(); */
