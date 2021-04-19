@@ -15,7 +15,7 @@ public:
   ~Alarm() {}
 
   // Populating constructor.
-  Alarm(AlarmFunc condition, String text = "alarm")
+  Alarm(AlarmFunc condition, String text = "Alert")
       : condition(condition), text(text){};
 
   // Lambda function evaluating to true when alarm is triggered.

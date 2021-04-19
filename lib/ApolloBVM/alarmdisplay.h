@@ -13,10 +13,12 @@ public:
   void start();
   void update(Alarm *alarm, float pip, float peep, float pp);
   void startIHold();
+  void updateIHold(float pip, float peep, float pp);
   void setBacklight(uint8_t r, uint8_t g, uint8_t b);
 
 private:
-  const String _ihold_lines[4] = {"  IHold Parameters",
+  const String _display_lines[3] = {"PIP = ", "PEEP = ", "PP = "};
+  const String _ihold_lines[6] = {"I-HOLD INITIATED", "Wait for Parameters", "  IHold Parameters",
                                   "PIP = ", "PEEP = ", "PP = "};
   const uint8_t _cols = 20;
   const uint8_t _rows = 4;

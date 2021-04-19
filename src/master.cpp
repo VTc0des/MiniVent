@@ -7,10 +7,7 @@
 VentIO vio;
 
 // Default settings.
-VentSettings vs = {'X', 500, 18, 1, 3, 0, 00, 0,50, 20, 0, 0, 0, false, false}; 
-
-//Default flag variables
-InspiratoryHold ih = {false, false};
+VentSettings vs = {'X', 450, 18, 1, 3, 0, 00, 20, 0, 0, 0, false, false}; 
 
 // Default limits.
 VentLimits vl;
@@ -38,9 +35,6 @@ VentIO& Panel::_vio= vio;
 // Init display panel pointer.
 Panel* cur_panel;
 
-// Init Alarm management system.
-AlarmManager am = AlarmManager(vio, 1);
-
 void transmit() {
 
   // Transmit to the slave device.
@@ -60,19 +54,8 @@ void transmit() {
     Wire.write(byte(vs.respiration_rate));
     Wire.write(byte(vs.inhale));
     Wire.write(byte(vs.exhale));
-
-    if (ih.ihold)
-    {
-      Wire.write(byte(vs.ihold_seconds));
-      Wire.write(byte(vs.ihold_decimals));
-      ih.ihold = false;
-      ih.holdComplete = true;
-    }
-    else
-    {
-      Wire.write(byte(vs.hold_seconds));
-      Wire.write(byte(vs.hold_decimals));
-    }
+    Wire.write(byte(vs.hold_seconds));
+    Wire.write(byte(vs.hold_decimals));
     Wire.write(byte(vs.delta_time)); //send default time if the ihold button is not pushed
     
     // Set the mode to on as device will start.
@@ -122,14 +105,6 @@ void setup()
   run_ptr = new RunningPanel(&apply_ptr, &pause_ptr);
   pause_ptr = new PausePanel(&start_ptr, &run_ptr);
 
-  /* am.addAlarm(0, Alarm([](VentIO &vio) { */ 
-  /*       return false; })); */
-  am.addAlarm(0, Alarm([](VentIO &vio) { 
-          //Send IHold message to follower/slave device now.
-
-          // Return alarm is true for IHold.
-        return vio.enc_button.getButtonState(); }));
-
   // Delay just cause.
   delay(100);
 
@@ -147,7 +122,7 @@ void loop()
   /* vio.enc_button.poll(); */
   /* vio.stop_button.poll(); */
   /* vio.ihold_button.poll(); */
-  //ihold = map(analogRead(ihold_main), 0, 1023, 0 255);
+
   //Update current panel.
   Panel* new_panel = cur_panel->update();
 

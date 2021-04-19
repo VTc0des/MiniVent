@@ -23,9 +23,6 @@ typedef struct {
   //units are in seconds not milliseconds.
   int hold_seconds;
   int hold_decimals;
-  int ihold_seconds; //0.5 seconds is 0,50 for ihold_seconds, ihold_decimals. 
-  int ihold_decimals;
-
 
   // Time between trajectory points.
   int delta_time;
@@ -44,50 +41,6 @@ typedef struct {
 } VentSettings;
 
 typedef struct {
-  bool ihold; //stores ihold button state on master controller
-  bool holdComplete; //is to trigger resending values to slave controller. 
-} InspiratoryHold;
-
-typedef struct {
-  //boolean flags for various alarm statuses
-  bool highP;//if breathing in pressure is too high.
-  bool lowP; //if auto-peep is occuring
-  bool insp; //if patient is breathing in
-
-  //pressure values
-  int high_pressure;
-  int low_peep;
-  int inspiratory_pressure;
-} AlarmSettings;
-
-typedef struct{
-  //variables for pressure sensor algorithm
-  int inspiratoryPressure;
-  int expiratoryPressure;
-  int plateauPressure;
-} SensorParameters;
-
-typedef struct{
-//all time constants are in milliseconds
-//for setup display duration
-unsigned long prevDispTime;
-unsigned long currDispTime;
-//for display update duration
-unsigned long prevUpdate;
-unsigned long currUpdate;
-//for pressures sensor measurement
-unsigned long prevPressureRead;
-unsigned long currPresssureRead;
-//for ihold measurement
-unsigned long previhold;
-unsigned long currihold;
-
-const long interval; //read pressure data for 10 seconds (~2/3 cycles). change based on insp and exp cycle. 
-const long inspHold;  //recommended time for inspiratory hold (0.5 seconds)
-const long displayTime; //time to display the intro message
-} TimeConsts;
-
-typedef struct {
 
   // Limits for ventilation settings.
   int min_tidal_volume = 300;
@@ -98,6 +51,7 @@ typedef struct {
   int max_respiration_rate = 30;
   int delta_respiration_rate = 1;
 
+  //max for inspiratory to expiratory ratio
   int min_exhale = 1;
   int max_exhale = 5;
   int delta_exhale = 1;
@@ -110,7 +64,6 @@ public:
   VentIO()
       : disp{DISPLAY_PIN}, enc{ENC_DT_PIN, ENC_CLK_PIN},
         enc_button{ENC_BUTTON_PIN, true}, stop_button{STOP_BUTTON_PIN, false},
-        ihold_button{IHOLD_BUTTON_PIN, false},
         limit_right{LIMIT_RIGHT_PIN, true}, limit_left{LIMIT_LEFT_PIN, true},
         buzzer(BUZZER_PIN) {}
 
@@ -118,7 +71,6 @@ public:
   Encoder enc;
   ButtonManager enc_button;
   ButtonManager stop_button;
-  ButtonManager ihold_button;
   ButtonManager limit_right;
   ButtonManager limit_left;
 
@@ -127,18 +79,10 @@ public:
   void poll() {
     enc_button.poll();
     stop_button.poll();
-    ihold_button.poll();
     limit_right.poll();
     limit_left.poll();
     buzzer.poll();
     //poll pressure sensor value?
-  }
-
-  void LED()
-  {
-    pinMode(RED_LIGHT, OUTPUT);
-    pinMode(GREEN_LIGHT, OUTPUT);
-    pinMode(BLUE_LIGHT, OUTPUT);
   }
 };
 

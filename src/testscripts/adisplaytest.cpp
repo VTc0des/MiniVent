@@ -16,7 +16,7 @@ void setup() {
   am.addAlarm (0,[](AlarmIO &aio) {
       Serial.println("Hi from alarm!");
       //function to get inspiratory pressure reading
-      return false;
+      return true;
     },
     "Alert: High Insp P"); //idx, condition, string text
 
@@ -36,9 +36,17 @@ void setup() {
 }
 
 void loop() {
+  //cyclically evaluate high pressure, low end expiratory pressure, and negative pressure in order of importance. 
   Alarm *triggered_alarm = am.evaluate(); //create a pointer variable to stroe the value of the pointer
-  ad.update(triggered_alarm, 3.4, 5.6,
-            7.8); // pass in values for pip, peep, pp from algorithm, don't put * dont want to dereference
+  ad.update(triggered_alarm, 3.4, 5.6, 7.8); 
+            // pass in values for pip, peep, pp from algorithm, don't put * dont want to dereference
+
+  // if (button push) {
+  //   send signal to F1;
+  //   ad.startIHold();
+  //   if signal recieved from F1
+  //   ad.updateIHold(3.4, 5.6, 7.8);
+  // }
 }
 
 #endif

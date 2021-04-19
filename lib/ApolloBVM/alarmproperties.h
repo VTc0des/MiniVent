@@ -60,7 +60,6 @@ public:
 
   void poll() {
     ihold_button.poll();
-
     // poll pressure sensor value?
   }
 
