@@ -28,15 +28,16 @@
 #define GREEN_LIGHT 5 //backlit green
 #define BLUE_LIGHT 6  //backlit blue
 
-//PIN FOR BOTH MAIN AND ALARM MC:
+//Digital Pin Definitions for I-HOLD Maneuver
 #define IHOLD_BUTTON_PIN 4
-#define ihold_main  A0
-#define ihold_alarm A1
+#define F2_TO_F1  2
+#define F1_TO_F2 13
 
 // Pin definitions (analog).
 //LEDs
 #define ALM_HIGH A3
 #define ALM_LOW  A4
 #define ALM_INSP A5
+
 // Pressure Sensor
 #define PS_Vout A2    //pin 3 on pressure sensor
