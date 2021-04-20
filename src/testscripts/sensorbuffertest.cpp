@@ -9,7 +9,7 @@ void setup() {
   Serial.begin(9600);
 
   for (uint16_t i = 0; i < 10; i++) {
-    sb.put_back(i);
+    sb.putBack(i);
   }
 
   Serial.println("Populated SensorBuffer...");
@@ -32,7 +32,7 @@ void loop() {
   x++;
   Serial.print("Adding new value: ");
   Serial.println(x);
-  sb.put_back(x);
+  sb.putBack(x);
 
   // Add another break.
   Serial.println();
