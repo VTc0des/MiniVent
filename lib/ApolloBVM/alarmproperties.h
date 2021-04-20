@@ -1,10 +1,10 @@
 #ifndef alarmproperties_h
 #define alarmproperties_h
 
-/* #include "alarmdisplay.h" */
 #include "buttonmanager.h"
 #include "constants.h"
 #include "pins.h"
+// #include "pressuremanager.h"
 
 typedef struct {
   bool ihold;        // stores ihold button state on master controller

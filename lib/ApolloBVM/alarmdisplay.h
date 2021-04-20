@@ -31,6 +31,7 @@ private:
   uint8_t _blue_pin;
 
   // variables to hold values that are outputted to the display
+  //put these floats in pressure manager, then pass them to the update functions
   float _pip;
   float _peep;
   float _pp;

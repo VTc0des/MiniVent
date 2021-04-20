@@ -22,17 +22,17 @@ void AlarmDisplay::start() {
 }
 
 void AlarmDisplay::update(Alarm *alarm, float pip, float peep, float pp) {
+  // use update to write new values while headers remain the same.
+
   _pip = pip;
   _peep = peep;
   _pp = pp;
-  // use update to write new values while headers remain the same.
-  
+    
   if (alarm != 0) {
     _lcd->setCursor(0, 0);
     _lcd->print(alarm->text);
   }
 
-  //_lcd->clear();
   _lcd->setCursor(8, 1);
   _lcd->print(_pip);
 
@@ -77,6 +77,7 @@ void AlarmDisplay::updateIHold (float pip, float peep, float pp) {
 
   _lcd->setCursor(8, 3);
   _lcd->print(_pp);
+  //on updates minimize how much text we write to the screen
 }
 
 void AlarmDisplay::setBacklight(uint8_t r, uint8_t g, uint8_t b) {

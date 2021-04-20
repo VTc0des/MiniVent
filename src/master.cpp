@@ -14,6 +14,9 @@ VentLimits vl;
 
 // Calibration for TV on Ambu bag SPUR II.
 int cal[9] = {950, 1062, 1155, 1238, 1320, 1393, 1465, 1538, 1610};
+//servo value for the slowest inhale cycle. calibrate using lab grade test equipment.
+//tidal value depends on the bag used. 
+//need a flow rate monitor. then integrate flow rate to obtain volume for these setpoints. 
 
 // String params for splash screens.
 String* splash_text = new String[4];

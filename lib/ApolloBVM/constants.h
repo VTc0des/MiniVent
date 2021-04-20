@@ -1,2 +1,2 @@
-#define IHOLD_SECONDS 0
-#define IHOLD_DECIMALS 50
+#define IHOLD_TIME = 0.5
+#define SAMPLING_FREQUENCY = 20 //20 ms. 
