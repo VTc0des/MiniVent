@@ -5,13 +5,11 @@
 SensorBuffer sb(10);
 unsigned long x;
 
-void setup()
-{
+void setup() {
   Serial.begin(9600);
 
-  for (uint16_t i = 0; i < 10; i++)
-  {
-     sb.put_back(i);
+  for (uint16_t i = 0; i < 10; i++) {
+    sb.put_back(i);
   }
 
   Serial.println("Populated SensorBuffer...");
@@ -19,11 +17,9 @@ void setup()
   x = 100;
 }
 
-void loop()
-{
+void loop() {
 
-  for (uint16_t i = 0; i < 10; i++)
-  {
+  for (uint16_t i = 0; i < 10; i++) {
     Serial.print("i: ");
     Serial.print(i);
     Serial.print(" sb: ");
@@ -36,6 +32,7 @@ void loop()
   x++;
   Serial.print("Adding new value: ");
   Serial.println(x);
+  sb.put_back(x);
 
   // Add another break.
   Serial.println();
