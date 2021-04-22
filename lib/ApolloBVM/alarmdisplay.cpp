@@ -1,7 +1,7 @@
 #include "alarmdisplay.h"
 
 AlarmDisplay::AlarmDisplay(uint8_t rs, uint8_t enable, uint8_t d0, uint8_t d1,
-                           uint8_t d2, uint8_t d3, int red, int green, int blue)
+                           uint8_t d2, uint8_t d3, uint8_t red, uint8_t green, uint8_t blue)
     : _red_pin(red), _green_pin(green), _blue_pin(blue), _pip(0), _peep(0),
       _pp(0) {
   _lcd = new LiquidCrystal(rs, enable, d0, d1, d2, d3);
@@ -10,7 +10,7 @@ AlarmDisplay::AlarmDisplay(uint8_t rs, uint8_t enable, uint8_t d0, uint8_t d1,
 void AlarmDisplay::start() {
   _lcd->begin(_cols, _rows); // pointer will populate memory address of _lcd
   setBacklight(0, 128, 128); // set blue-green color for display
-
+ 
   _lcd->setCursor(0, 1);
   _lcd->print(_display_lines[0]);
 
@@ -43,7 +43,8 @@ void AlarmDisplay::update(Alarm *alarm, float pip, float peep, float pp) {
   _lcd->print(_pp);
 }
 
-void AlarmDisplay::startIHold() {
+void AlarmDisplay::IHoldMessage() {
+  _lcd->clear();
   setBacklight(0, 128, 128); // set blue-green color for display
 
   _lcd->setCursor(0, 1);
@@ -53,7 +54,7 @@ void AlarmDisplay::startIHold() {
   _lcd->print(_ihold_lines[1]);
 }
 
-void AlarmDisplay::updateIHold (float pip, float peep, float pp) {
+void AlarmDisplay::startIHold() {
   _lcd->clear();
   setBacklight(0, 128, 128); // set blue-green color for display
 
@@ -68,7 +69,9 @@ void AlarmDisplay::updateIHold (float pip, float peep, float pp) {
 
   _lcd->setCursor(0, 3);
   _lcd->print(_ihold_lines[5]);
+}
 
+void AlarmDisplay::updateIHold (float pip, float peep, float pp) {
   _lcd->setCursor(8, 1);
   _lcd->print(_pip);
 
@@ -77,7 +80,6 @@ void AlarmDisplay::updateIHold (float pip, float peep, float pp) {
 
   _lcd->setCursor(8, 3);
   _lcd->print(_pp);
-  //on updates minimize how much text we write to the screen
 }
 
 void AlarmDisplay::setBacklight(uint8_t r, uint8_t g, uint8_t b) {

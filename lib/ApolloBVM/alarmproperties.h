@@ -4,6 +4,7 @@
 #include "buttonmanager.h"
 #include "constants.h"
 #include "pins.h"
+
 // #include "pressuremanager.h"
 
 typedef struct {
@@ -54,7 +55,7 @@ typedef struct {
 class AlarmIO {
 
 public:
-  AlarmIO() : ihold_button{IHOLD_BUTTON_PIN, false} {};
+  AlarmIO() : ihold_button{IHOLD_BUTTON_PIN, false} {}
 
   ButtonManager ihold_button;
 
@@ -62,12 +63,7 @@ public:
     ihold_button.poll();
     // poll pressure sensor value?
   }
-
-  void LED() {
-    pinMode(RED_LIGHT, OUTPUT);
-    pinMode(GREEN_LIGHT, OUTPUT);
-    pinMode(BLUE_LIGHT, OUTPUT);
-  }
+  
 };
 
 #endif

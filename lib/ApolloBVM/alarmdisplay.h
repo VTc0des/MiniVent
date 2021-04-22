@@ -8,10 +8,11 @@
 class AlarmDisplay {
 public:
   AlarmDisplay(uint8_t rs, uint8_t enable, uint8_t d0, uint8_t d1, uint8_t d2,
-               uint8_t d3, int red, int green, int blue);
+               uint8_t d3, uint8_t red, uint8_t green, uint8_t blue);
 
   void start();
   void update(Alarm *alarm, float pip, float peep, float pp);
+  void IHoldMessage();
   void startIHold();
   void updateIHold(float pip, float peep, float pp);
   void setBacklight(uint8_t r, uint8_t g, uint8_t b);

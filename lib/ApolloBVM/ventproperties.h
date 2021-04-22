@@ -1,5 +1,5 @@
-#ifndef ventsettings_h
-#define ventsettings_h
+#ifndef ventproperties_h
+#define ventproperties_h
 
 #include "Encoder.h"
 #include "buttonmanager.h"
@@ -7,8 +7,6 @@
 #include "encodermanager.h"
 #include "nhd_0420d3z.h"
 #include "pins.h"
-#include "constants.h"
-#include <LiquidCrystal.h>
 
 typedef struct {
 
@@ -42,7 +40,6 @@ typedef struct {
 
 typedef struct {
 
-  // Limits for ventilation settings.
   int min_tidal_volume = 300;
   int max_tidal_volume = 700;
   int delta_tidal_volume = 50;
@@ -51,7 +48,6 @@ typedef struct {
   int max_respiration_rate = 30;
   int delta_respiration_rate = 1;
 
-  //max for inspiratory to expiratory ratio
   int min_exhale = 1;
   int max_exhale = 5;
   int delta_exhale = 1;
@@ -82,7 +78,6 @@ public:
     limit_right.poll();
     limit_left.poll();
     buzzer.poll();
-    //poll pressure sensor value?
   }
 };
 

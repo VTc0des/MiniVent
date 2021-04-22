@@ -13,7 +13,8 @@ VentSettings vs = {'X', 450, 18, 1, 3, 0, 00, 20, 0, 0, 0, false, false};
 VentLimits vl;
 
 // Calibration for TV on Ambu bag SPUR II.
-int cal[9] = {950, 1062, 1155, 1238, 1320, 1393, 1465, 1538, 1610};
+ int cal[9] = {950, 1062, 1155, 1238, 1320, 1393, 1465, 1538, 1610};
+//  int cal[9] = {409, 457, 497, 533, 568, 600, 631, 662, 693};
 //servo value for the slowest inhale cycle. calibrate using lab grade test equipment.
 //tidal value depends on the bag used. 
 //need a flow rate monitor. then integrate flow rate to obtain volume for these setpoints. 
@@ -122,9 +123,6 @@ void loop()
 
   // Poll button status.
   vio.poll();
-  /* vio.enc_button.poll(); */
-  /* vio.stop_button.poll(); */
-  /* vio.ihold_button.poll(); */
 
   //Update current panel.
   Panel* new_panel = cur_panel->update();
@@ -135,10 +133,6 @@ void loop()
     cur_panel->start();
   }
 
-  //create new update method for the alarm to print to control screen that ihold is in progress and send a stop signal to the machine, then a load signal to the machine 
-  //with ihold parameters, then trigger another stop and load of settings. 
-  //triggering stop is important not to interrupt the ventilator mid trajectory.
-  //analogWrite(ihold_alarm, 255);
   // Transmit to the device if necessary.
   if (vs.send) {
     transmit();

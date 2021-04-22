@@ -30,8 +30,8 @@
 
 //Digital Pin Definitions for I-HOLD Maneuver
 #define IHOLD_BUTTON_PIN 4
-#define F2_TO_F1  2
-#define F1_TO_F2 13
+// #define F2_TO_F1  2
+// #define F1_TO_F2 13
 
 // Pin definitions (analog).
 //LEDs

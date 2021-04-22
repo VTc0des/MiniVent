@@ -6,16 +6,22 @@
 
 class PressureManager {
 public:
-    PressureManager(double reading);
+    PressureManager(int reading, uint8_t pressure_pin);
 
-    void start(); //is calibrate for baseline 
+    void calibrate(); //is calibrate for baseline 
     void poll();
     void smooth(); //try to replace with hardware filters, will save memory space and improve processing speed. 
     void peakDetection();
 
 private:
-    // variables to hold values that are outputted to the display
-    //put these floats in pressure manager, then pass them to the update functions
+
+    //poll for a new pressure sample every 20 ms
+    const uint8_t _sample_rate = 20;
+    
+    //pin location for the pressure sensor. 
+    uint8_t _pressure_pin;
+
+    //will it a problem if these variables are the same as alarmdisplay.h
     float _pip;
     float _peep;
     float _pp;

@@ -1,8 +1,10 @@
 #ifdef TST
+
+#include "constants.h"
+#include "pins.h"
 #include <Wire.h>
 #include <Servo.h>
 #include <trajfactory.h>
-#include "constants.h"
 
 // Address of slave.
 #define SLAVE_ADDR 8
@@ -14,11 +16,13 @@
 #define SERVO_MIN 2400
 #define SERVO_MAX 550
 
+// Pins for MC connections
+#define F2_TO_F1 2
+#define F1_TO_F2 13
+
 // Init trajectory generation and current pointer.
 TrajFactory tf = TrajFactory();
 Trajectory* traj_ptr = 0;
-//point to hold prev trajectory pointer and reload after I-Hold is complete. 
-Trajectory* save_traj_ptr = 0; 
 
 // Init servo class.
 Servo servo;
@@ -32,13 +36,9 @@ int delta_t;
 char state;
 
 // Init I-Hold params
-float ihold;
-bool iholdInit;
 bool iholdComplete;
-
-int currStep;
-unsigned long startIholdTime;
-unsigned long prevTime;
+int currIHoldStep;
+unsigned long startIHoldTime;
 
 void moveTo(int pos, int delta_t){
 
@@ -84,6 +84,8 @@ void recieveTraj(int num_entries) {
       byte high = Wire.read();
       byte low = Wire.read();
       setpoint = (high << 8) | low;
+      Serial.print("setpoint = ");
+      Serial.println(setpoint);
 
       rr = Wire.read();
 
@@ -116,19 +118,21 @@ void setup() {
   servo.attach(SERVO_PIN);
 
   // Initialize I-Hold parameters
-  iholdInit = false;
   iholdComplete = false;
 
-  // prevTime = 
+  /// Congifure pinMode for communicating F1 <-> F2;
+  pinMode(F2_TO_F1, INPUT);
+  pinMode(F1_TO_F2, OUTPUT);
 
   // Set state to off.
   state = 'X';
 }
 
 void loop() {
-
+  //if you are not already in ihold or load states, set state to begin ihold if button push is recieved. 
   if (digitalRead(F2_TO_F1) == HIGH && state != 'I' && state != 'C' && state != 'L') {
     state = 'C';
+    //state C for confirm ihold
   } 
 
   // Run device in different modes.
@@ -161,37 +165,45 @@ void loop() {
       state = 'O';
       break;
 
-    // Device has been instructed to initiate inspiratory hold manuever
+    // Device has been instructed to maintain inspiratory hold manuever
     case 'I':
 
-      currStep = traj_ptr->nextStep();
-      moveTo(currStep, traj_ptr->getDeltaTime());
+      currIHoldStep = traj_ptr->nextStep();
+      moveTo(currIHoldStep, traj_ptr->getDeltaTime());
 
       // Send signal to F2 that ihold initiated.
-      if (currStep == setpoint)
-      {
-        digitalWrite(F1_to_F2, HIGH);
-        iholdComplete = true;
-        // startIholdTime = millis();
-      }
+      if (currIHoldStep == setpoint) {
+        digitalWrite(F1_TO_F2, HIGH);
+        
+        // Start clock on IHold
+        startIHoldTime = millis();
+
+        // Check if 0.5s have passed in while loop. 
+        while (millis() - startIHoldTime <= IHOLD_TIME*10000) {
+          iholdComplete = true;
+        } //end of while
+      } 
       else {
-        digitalWrite(F1_to_F2, LOW);
+        digitalWrite(F1_TO_F2, LOW);
         if (iholdComplete){
           iholdComplete = false;
-          state = 'L'
+          state = 'L';
         }
       }
       break;
 
+    // Device has recieved confirm ihold state, load ihold trajectory then start
     case 'C':
-    // load settings for IHOLD
+
+      Serial.println("IN CASE C");
+
       // Stop motion.
       stop();
 
       if (traj_ptr != 0){
         delete traj_ptr;
       }
-
+      
       // Build new trajectory
       traj_ptr = tf.build(rr, ie, setpoint, IHOLD_TIME, delta_t);
 
