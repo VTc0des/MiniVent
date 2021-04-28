@@ -21,7 +21,7 @@ void setup() {
   // Congifure pinMode for communicating F2 <-> F1;
   pinMode(F2_TO_F1, OUTPUT);
   pinMode(F1_TO_F2, INPUT);
-
+  
   ad.start();
 
   am.addAlarm (0,[](AlarmIO &aio) {
@@ -53,6 +53,7 @@ void loop() {
 
   if (aio.ihold_button.getButtonState() == true) {
     digitalWrite(F2_TO_F1, HIGH);
+    Serial.println("Button Input detected");
   }
   else { 
     digitalWrite(F2_TO_F1, LOW);
@@ -66,6 +67,7 @@ void loop() {
   else {
     // when the signal turns off, replace with this panel
     ad.updateIHold(9.4, 10.6, 5.8);
+    Serial.println("I-Hold Complete!");
   }
 }
 

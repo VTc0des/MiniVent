@@ -37,6 +37,7 @@ char state;
 
 // Init I-Hold params
 bool iholdComplete;
+bool iholdStart;
 int currIHoldStep;
 unsigned long startIHoldTime;
 
@@ -119,6 +120,7 @@ void setup() {
 
   // Initialize I-Hold parameters
   iholdComplete = false;
+  iholdStart = true;  //set to true in setup so first ihold will run. 
 
   /// Congifure pinMode for communicating F1 <-> F2;
   pinMode(F2_TO_F1, INPUT);
@@ -129,10 +131,11 @@ void setup() {
 }
 
 void loop() {
-  //if you are not already in ihold or load states, set state to begin ihold if button push is recieved. 
-  if (digitalRead(F2_TO_F1) == HIGH && state != 'I' && state != 'C' && state != 'L') {
+  //only if you recieve a signal from F2 AND system is in the ON state. NOT in the stop, load, or ihold states already
+  if (digitalRead(F2_TO_F1) == HIGH && state != 'I' && state != 'C' && state != 'L' && state != 'X') {
     state = 'C';
-    //state C for confirm ihold
+    Serial.println(state);
+    //set the state to C to confirm ihold
   } 
 
   // Run device in different modes.
@@ -165,37 +168,10 @@ void loop() {
       state = 'O';
       break;
 
-    // Device has been instructed to maintain inspiratory hold manuever
-    case 'I':
-
-      currIHoldStep = traj_ptr->nextStep();
-      moveTo(currIHoldStep, traj_ptr->getDeltaTime());
-
-      // Send signal to F2 that ihold initiated.
-      if (currIHoldStep == setpoint) {
-        digitalWrite(F1_TO_F2, HIGH);
-        
-        // Start clock on IHold
-        startIHoldTime = millis();
-
-        // Check if 0.5s have passed in while loop. 
-        while (millis() - startIHoldTime <= IHOLD_TIME*10000) {
-          iholdComplete = true;
-        } //end of while
-      } 
-      else {
-        digitalWrite(F1_TO_F2, LOW);
-        if (iholdComplete){
-          iholdComplete = false;
-          state = 'L';
-        }
-      }
-      break;
-
     // Device has recieved confirm ihold state, load ihold trajectory then start
     case 'C':
 
-      Serial.println("IN CASE C");
+      Serial.println("Recieved I-Hold");
 
       // Stop motion.
       stop();
@@ -210,7 +186,41 @@ void loop() {
       // Set device on.
       state = 'I';
       break;
-  }
+
+       // Device has been instructed to maintain inspiratory hold manuever
+    case 'I':
+
+      currIHoldStep = traj_ptr->nextStep();
+      moveTo(currIHoldStep, traj_ptr->getDeltaTime());
+
+      // Send signal to F2 that ihold initiated.
+      if (currIHoldStep == setpoint) {
+        Serial.println("At setpoint");
+        digitalWrite(F1_TO_F2, HIGH);
+        
+        //start time only when currIHoldStep reaches the setpoint. 
+        if (iholdStart){
+          // Start clock on IHold
+          startIHoldTime = millis();
+          iholdStart = false;
+        } //end of if
+        
+        // Check if 0.5s have passed in if
+        if (millis() - startIHoldTime >= IHOLD_TIME*1000) {
+          iholdComplete = true;
+          iholdStart = true;  //reset the variable for the next ihold implementation
+        } //end of if
+      } 
+      else {
+        digitalWrite(F1_TO_F2, LOW);
+        if (iholdComplete){
+          Serial.println("Away from setpoint");
+          iholdComplete = false;
+          state = 'L';
+        }
+      }
+      break;
+  } //end of switch
 } //end of loop
 
 #endif

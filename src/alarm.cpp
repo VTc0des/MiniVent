@@ -43,34 +43,34 @@ void setup ()
 
 void loop ()
 {
-    //poll button for I-HOLD input
-    vio.ihold_button.poll();
+    // //poll button for I-HOLD input
+    // vio.ihold_button.poll();
 
-    //if button pushed
-    if (vio.ihold_button.getButtonState())
-    {
-        //send signal to master microcontroller
-        analogWrite(ihold_main, 255); //send high signal to master
-        //if signal comes back from master indicating the 
-        //motors are at the beginning of the inspiratory cycle go to the function
-        if (map(analogRead(ihold_alarm), 0, 1023, 0, 255))
-        {
-            ihold();
-        } 
-    }
-    else {
-        analogWrite(ihold_main, 0); //send 0 to indicate no button push
-    }
+    // //if button pushed
+    // if (vio.ihold_button.getButtonState())
+    // {
+    //     //send signal to master microcontroller
+    //     analogWrite(ihold_main, 255); //send high signal to master
+    //     //if signal comes back from master indicating the 
+    //     //motors are at the beginning of the inspiratory cycle go to the function
+    //     if (map(analogRead(ihold_alarm), 0, 1023, 0, 255))
+    //     {
+    //         ihold();
+    //     } 
+    // }
+    // else {
+    //     analogWrite(ihold_main, 0); //send 0 to indicate no button push
+    // }
 
-    //read for set amount of time.
-    readPressure();
+    // //read for set amount of time.
+    // readPressure();
 
-    /*tc.currihold = millis(); //take current time. 
-    if (tc.currihold - tc.previhold >= tc.inspHold)
-    {
-        tc.previhold = tc.currihold;
-        readPressure();
-    }*/
+    // /*tc.currihold = millis(); //take current time. 
+    // if (tc.currihold - tc.previhold >= tc.inspHold)
+    // {
+    //     tc.previhold = tc.currihold;
+    //     readPressure();
+    // }*/
 }
 
 void printWarning()

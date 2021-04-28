@@ -7,7 +7,7 @@
 VentIO vio;
 
 // Default settings.
-VentSettings vs = {'X', 450, 18, 1, 3, 0, 00, 20, 0, 0, 0, false, false}; 
+VentSettings vs = {'X', 180, 24, 1, 3, 0, 00, 20, 0, 0, 0, false, false}; 
 
 // Default limits.
 VentLimits vl;
@@ -40,7 +40,7 @@ VentIO& Panel::_vio= vio;
 Panel* cur_panel;
 
 void transmit() {
-
+  
   // Transmit to the slave device.
   Wire.beginTransmission(SLAVE_ADDR);
 
@@ -120,7 +120,6 @@ void setup()
 
 void loop()
 {
-
   // Poll button status.
   vio.poll();
 
