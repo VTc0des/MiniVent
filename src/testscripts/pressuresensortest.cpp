@@ -78,12 +78,11 @@ void setup()
   i = 0;
 
   baseline = analogRead(PS_PIN); // obtains first value once start up
-  baseline = (baseline * 100 * mBar_cmH2O) / 1023;
+  // baseline = (baseline * 100 * mBar_cmH2O) / 1023;
   //filter raw data
 //  EMA_S_low = ((EMA_a_low * baseline) + ((1 - EMA_a_low) * EMA_S_low)); //run the EMA
 
-//  baseline = EMA_S_low;
-
+  EMA_S_low = baseline; //set EMA_S_low for t=0
 
   previousRead = millis();
 }

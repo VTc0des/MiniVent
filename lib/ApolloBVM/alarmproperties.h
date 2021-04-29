@@ -4,66 +4,48 @@
 #include "buttonmanager.h"
 #include "constants.h"
 #include "pins.h"
-
-// #include "pressuremanager.h"
-
-typedef struct {
-  bool ihold;        // stores ihold button state on master controller
-  bool holdComplete; // is to trigger resending values to slave controller.
-} InspiratoryHold;
-
-typedef struct {
-  // boolean flags for various alarm statuses
-  bool highP; // if breathing in pressure is too high.
-  bool lowP;  // if auto-peep is occuring
-  bool insp;  // if patient is breathing in
-
-  // pressure values
-  int high_pressure;
-  int low_peep;
-  int inspiratory_pressure;
-} AlarmSettings;
+#include "pressuremanager.h"
 
 typedef struct {
   // variables for pressure sensor algorithm
-  int inspiratoryPressure;
-  int expiratoryPressure;
-  int plateauPressure;
+  float max_pip; //35 cmH2O
+  float pip;
+  float peep;
+  float pp;
 } SensorParameters;
-
-typedef struct {
-  // all time constants are in milliseconds
-  // for setup display duration
-  unsigned long prevDispTime;
-  unsigned long currDispTime;
-  // for display update duration
-  unsigned long prevUpdate;
-  unsigned long currUpdate;
-  // for pressures sensor measurement
-  unsigned long prevPressureRead;
-  unsigned long currPresssureRead;
-  // for ihold measurement
-  unsigned long previhold;
-  unsigned long currihold;
-
-  const long interval;    // read pressure data for 10 seconds (~2/3 cycles).
-                          // change based on insp and exp cycle.
-  const long inspHold;    // recommended time for inspiratory hold (0.5 seconds)
-  const long displayTime; // time to display the intro message
-} TimeConsts;
 
 class AlarmIO {
 
 public:
-  AlarmIO() : ihold_button{IHOLD_BUTTON_PIN, false} {}
+  AlarmIO() : ihold_button{IHOLD_BUTTON_PIN, false}, pressure_input{PS_Vout} {}
 
   ButtonManager ihold_button;
+  PressureManager pressure_input;
+
+  void calibrate() {
+    pressure_input.calibrate();
+    //add calibration methods for other sensors
+  }
 
   void poll() {
     ihold_button.poll();
-    // poll pressure sensor value?
+    pressure_input.poll();
   }
-  
+
+  //process inspiratory pressure
+  float ipProcess() {
+    return pressure_input.ipProcess();
+  }
+
+  //process plateau pressure
+  float ppProcess() {
+    return pressure_input.ppProcess();
+  }
+
+  //process end expiratory pressure
+  float epProcess() {
+    return pressure_input.epProcess();
+  }
 };
 
 #endif

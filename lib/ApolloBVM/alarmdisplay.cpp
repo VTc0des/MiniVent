@@ -7,23 +7,50 @@ AlarmDisplay::AlarmDisplay(uint8_t rs, uint8_t enable, uint8_t d0, uint8_t d1,
   _lcd = new LiquidCrystal(rs, enable, d0, d1, d2, d3);
 }
 
-void AlarmDisplay::start() {
+void AlarmDisplay::warning() {
   _lcd->begin(_cols, _rows); // pointer will populate memory address of _lcd
+  setBacklight(0, 128, 128); // set blue-green color for display
+
+  _lcd->setCursor(6, 1);
+  _lcd->print(_warning_lines[0]);
+
+  delay(2000);
+  _lcd->clear();
+
+  _lcd->setCursor(6,1);
+  _lcd->print(_warning_lines[1]);
+
+  _lcd->setCursor(1, 2);
+  _lcd->print(_warning_lines[2]);
+
+  delay(2000);
+  _lcd->clear();
+}
+
+void AlarmDisplay::start() {
   setBacklight(0, 128, 128); // set blue-green color for display
 
   _lcd->setCursor(0, 1);
   _lcd->print(_display_lines[0]);
 
+  _lcd->setCursor(15, 1);
+  _lcd->print(_display_lines[3]);
+
   _lcd->setCursor(0, 2);
   _lcd->print(_display_lines[1]);
 
+  _lcd->setCursor(15, 2);
+  _lcd->print(_display_lines[3]);
+
   _lcd->setCursor(0, 3);
   _lcd->print(_display_lines[2]);
+
+  _lcd->setCursor(15, 3);
+  _lcd->print(_display_lines[3]);
+
 }
 
 void AlarmDisplay::update(Alarm *alarm, float pip, float peep, float pp) {
-  // use update to write new values while headers remain the same.
-
   _pip = pip;
   _peep = peep;
   _pp = pp;
@@ -31,6 +58,10 @@ void AlarmDisplay::update(Alarm *alarm, float pip, float peep, float pp) {
   if (alarm != 0) {
     _lcd->setCursor(0, 0);
     _lcd->print(alarm->text);
+    setBacklight(255, 0, 0);
+  }
+  else {
+    setBacklight(0, 255, 0);
   }
 
   _lcd->setCursor(8, 1);
@@ -44,7 +75,7 @@ void AlarmDisplay::update(Alarm *alarm, float pip, float peep, float pp) {
 }
 
 void AlarmDisplay::IHoldMessage() {
-  _lcd->clear();
+  // _lcd->clear();
   setBacklight(0, 128, 128); // set blue-green color for display
 
   _lcd->setCursor(0, 1);
@@ -55,7 +86,7 @@ void AlarmDisplay::IHoldMessage() {
 }
 
 void AlarmDisplay::startIHold() {
-  _lcd->clear();
+  // _lcd->clear();
   setBacklight(0, 128, 128); // set blue-green color for display
 
   _lcd->setCursor(0,0);
@@ -64,11 +95,20 @@ void AlarmDisplay::startIHold() {
   _lcd->setCursor(0, 1);
   _lcd->print(_ihold_lines[3]);
 
+  _lcd->setCursor(15, 1);
+  _lcd->print(_ihold_lines[6]);
+
   _lcd->setCursor(0, 2);
   _lcd->print(_ihold_lines[4]);
 
+  _lcd->setCursor(15, 2);
+  _lcd->print(_ihold_lines[6]);
+
   _lcd->setCursor(0, 3);
   _lcd->print(_ihold_lines[5]);
+
+  _lcd->setCursor(15, 3);
+  _lcd->print(_ihold_lines[6]);
 }
 
 void AlarmDisplay::updateIHold (float pip, float peep, float pp) {

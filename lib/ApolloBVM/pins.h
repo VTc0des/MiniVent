@@ -31,14 +31,14 @@
 
 //Digital Pin Definitions for I-HOLD Maneuver
 #define IHOLD_BUTTON_PIN 4
-// #define F2_TO_F1  2
-// #define F1_TO_F2 13
+#define F2_TO_F1 2
+#define F1_TO_F2 13
 
 // Pin definitions (analog).
 //LEDs
-#define ALM_HIGH A3
-#define ALM_LOW  A4
-#define ALM_INSP A5
+#define AWAKE_ALARM A3
+#define PEEP_ALARM A4
+#define PIP_ALARM A5
 
 // Pressure Sensor
 #define PS_Vout A2    //pin 3 on pressure sensor
