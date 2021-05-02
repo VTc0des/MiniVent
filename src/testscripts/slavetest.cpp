@@ -1,10 +1,10 @@
 #ifdef TST
 
-#include "constants.h"
-#include "pins.h"
 #include <Wire.h>
 #include <Servo.h>
 #include <trajfactory.h>
+#include "constants.h"
+#include "pins.h"
 
 // Address of slave.
 #define SLAVE_ADDR 8
@@ -15,10 +15,6 @@
 // Limits of servo.
 #define SERVO_MIN 2400
 #define SERVO_MAX 550
-
-// Pins for MC connections
-#define F2_TO_F1 2
-#define F1_TO_F2 13
 
 // Init trajectory generation and current pointer.
 TrajFactory tf = TrajFactory();
@@ -44,7 +40,8 @@ unsigned long startIHoldTime;
 void moveTo(int pos, int delta_t){
 
   // Write current position instruction to console.
-  // Serial.println(pos);
+  Serial.print("Position:");
+  Serial.println(pos);
 
   // Move the servos to next setpoint 
   servo.writeMicroseconds(SERVO_MIN-pos);
@@ -129,26 +126,16 @@ void setup() {
 }
 
 void loop() {
-  if (digitalRead(F2_TO_F1) == HIGH) {
-    Serial.println("boo");
-  }
-
-  else {
-    Serial.println("eh");
-  }
-  // //only if you recieve a signal from F2 AND system is in the ON state. NOT in the stop, load, or ihold states already
-  // if (digitalRead(F2_TO_F1) == HIGH && state != 'I' && state != 'C' && state != 'L' && state != 'X') {
-  //   state = 'C';
-  //   Serial.println("Recieved high signal");
-  //   //set the state to C to confirm ihold
-  // } 
-
-  // else {
-  //   Serial.println("Recieved low signal");
-  // }
+  if (digitalRead(F2_TO_F1) == HIGH && state != 'I' && state != 'C' && state != 'L' && state != 'X') {
+    // if signal recieved from F2 AND not already in C, I, L, or X states (confirm, initiate, load, stop)
+    // set the state to C to confirm ihold
+    state = 'C';  
+    Serial.println("I-Hold Request Confirmed");
+  } 
 
   // Run device in different modes.
   switch (state) {
+
     // Device is on, continue following trajectory.
     case 'O': 
       moveTo(traj_ptr->nextStep(), traj_ptr->getDeltaTime());
@@ -180,8 +167,6 @@ void loop() {
     // Device has recieved confirm ihold state, load ihold trajectory then start
     case 'C':
 
-      Serial.println("Recieved I-Hold");
-
       // Stop motion.
       stop();
 
@@ -204,17 +189,17 @@ void loop() {
 
       // Send signal to F2 that ihold initiated.
       if (currIHoldStep == setpoint) {
-        Serial.println("At setpoint");
         digitalWrite(F1_TO_F2, HIGH);
         
         //start time only when currIHoldStep reaches the setpoint. 
         if (iholdStart){
+          Serial.println("Begin I-HOLD");
           // Start clock on IHold
           startIHoldTime = millis();
           iholdStart = false;
         } //end of if
         
-        // Check if 0.5s have passed in if
+        // Check if 0.5s have passed
         if (millis() - startIHoldTime >= IHOLD_TIME*1000) {
           iholdComplete = true;
           iholdStart = true;  //reset the variable for the next ihold implementation
@@ -223,8 +208,8 @@ void loop() {
       else {
         digitalWrite(F1_TO_F2, LOW);
         if (iholdComplete){
-          Serial.println("Away from setpoint");
-          iholdComplete = false;
+          Serial.println("End I-HOLD");
+          iholdComplete = false;  //reset the variable for the next ihold implementation
           state = 'L';
         }
       }
