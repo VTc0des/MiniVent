@@ -1,4 +1,4 @@
-#ifdef MST
+#ifdef CTL
 #include <Arduino.h>
 #include "panel.h"
 #include "Wire.h"
@@ -7,14 +7,13 @@
 VentIO vio;
 
 // Default settings.
-VentSettings vs = {'X', 180, 24, 1, 3, 0, 00, 20, 0, 0, 0, false, false}; 
+VentSettings vs = {'X', 180, 25, 1, 3, 0, 00, 20, 0, 0, 0, false, false}; 
 
 // Default limits.
 VentLimits vl;
 
 // Calibration for TV on Ambu bag SPUR II.
  int cal[9] = {950, 1062, 1155, 1238, 1320, 1393, 1465, 1538, 1610};
-//  int cal[9] = {409, 457, 497, 533, 568, 600, 631, 662, 693};
 //servo value for the slowest inhale cycle. calibrate using lab grade test equipment.
 //tidal value depends on the bag used. 
 //need a flow rate monitor. then integrate flow rate to obtain volume for these setpoints. 
