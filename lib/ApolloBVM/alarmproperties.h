@@ -7,11 +7,14 @@
 #include "pressuremanager.h"
 
 typedef struct {
-  // variables for pressure sensor algorithm
+  // variables for pressure sensor on expiratory limb
   float max_pip; //35 cmH2O
   float pip;
   float peep;
   float pp;
+
+  // variables for flow sensor on inspiratory limb
+  float inspiratoryVolume;
 } SensorParameters;
 
 class AlarmIO {

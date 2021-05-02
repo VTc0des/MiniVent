@@ -44,7 +44,7 @@ unsigned long startIHoldTime;
 void moveTo(int pos, int delta_t){
 
   // Write current position instruction to console.
-  Serial.println(pos);
+  // Serial.println(pos);
 
   // Move the servos to next setpoint 
   servo.writeMicroseconds(SERVO_MIN-pos);
@@ -85,8 +85,6 @@ void recieveTraj(int num_entries) {
       byte high = Wire.read();
       byte low = Wire.read();
       setpoint = (high << 8) | low;
-      Serial.print("setpoint = ");
-      Serial.println(setpoint);
 
       rr = Wire.read();
 
@@ -131,12 +129,23 @@ void setup() {
 }
 
 void loop() {
-  //only if you recieve a signal from F2 AND system is in the ON state. NOT in the stop, load, or ihold states already
-  if (digitalRead(F2_TO_F1) == HIGH && state != 'I' && state != 'C' && state != 'L' && state != 'X') {
-    state = 'C';
-    Serial.println(state);
-    //set the state to C to confirm ihold
-  } 
+  if (digitalRead(F2_TO_F1) == HIGH) {
+    Serial.println("boo");
+  }
+
+  else {
+    Serial.println("eh");
+  }
+  // //only if you recieve a signal from F2 AND system is in the ON state. NOT in the stop, load, or ihold states already
+  // if (digitalRead(F2_TO_F1) == HIGH && state != 'I' && state != 'C' && state != 'L' && state != 'X') {
+  //   state = 'C';
+  //   Serial.println("Recieved high signal");
+  //   //set the state to C to confirm ihold
+  // } 
+
+  // else {
+  //   Serial.println("Recieved low signal");
+  // }
 
   // Run device in different modes.
   switch (state) {
