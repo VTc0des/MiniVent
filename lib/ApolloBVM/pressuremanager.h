@@ -36,7 +36,8 @@ private:
     unsigned long _previousRead;
 
     float _pip = 0.0;
-    float _peep = 0.0;
+    float _peep = 3.0;      //set to 3 during testing to avoid setting off low peep alarm. 
+    // float _peep = 0.0;   //uncomment ln 40 and comment ln 39 once _peep functionality is implemented
     float _pp = 0.0;
 };
 

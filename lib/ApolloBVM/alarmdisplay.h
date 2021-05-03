@@ -14,15 +14,14 @@ public:
   void start();
   void update(Alarm *alarm, float pip, float peep, float pp);
   void IHoldMessage();
-  void startIHold();
   void updateIHold(float pip, float peep, float pp);
   void setBacklight(uint8_t r, uint8_t g, uint8_t b);
+  void clearOneLine(uint8_t row_pos);
 
 private:
-  const String _warning_lines[3] = {"MINIVENT", "WARNING", "USE PEDI SIZED BAG"};
-  const String _display_lines[4] = {"PIP  = ", "PEEP = ", "PP  = ", "cmH2O"};
-  const String _ihold_lines[7] = {"I-HOLD INITIATED", "Wait for Parameters", "  IHold Parameters",
-                                  "PIP  = ", "PEEP = ", "PP  = ", "cmH2O"};
+  const String _warning_lines[4] = {"MINIVENT", "WARNING:", "USE PEDI SIZED", "BAG VALVE MASK"};
+  const String _display_lines[4] = {"PIP  = ", "PEEP = ", "PP   = ", "cmH2O"};
+  const String _ihold_lines[2] = {"I-HOLD INITIATED    ", "I-HOLD PARAMETERS   "};
   const uint8_t _cols = 20;
   const uint8_t _rows = 4;
   const uint8_t _brightness = 255;

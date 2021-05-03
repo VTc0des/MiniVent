@@ -17,19 +17,21 @@ void AlarmDisplay::warning() {
   delay(2000);
   _lcd->clear();
 
-  _lcd->setCursor(6,1);
+  _lcd->setCursor(6,0);
   _lcd->print(_warning_lines[1]);
 
-  _lcd->setCursor(1, 2);
+  _lcd->setCursor(3, 1);
   _lcd->print(_warning_lines[2]);
 
+  _lcd->setCursor(3, 2);
+  _lcd->print(_warning_lines[3]);
+
   delay(2000);
-  _lcd->clear();
 }
 
 void AlarmDisplay::start() {
-  setBacklight(0, 128, 128); // set blue-green color for display
-
+  _lcd->clear();
+  // print header and units
   _lcd->setCursor(0, 1);
   _lcd->print(_display_lines[0]);
 
@@ -56,12 +58,14 @@ void AlarmDisplay::update(Alarm *alarm, float pip, float peep, float pp) {
   _pp = pp;
     
   if (alarm != 0) {
+    setBacklight(255, 0, 0);  //set backlight to red
     _lcd->setCursor(0, 0);
-    _lcd->print(alarm->text);
-    setBacklight(255, 0, 0);
+    _lcd->print(alarm->text); //print top line with text specified in src file
   }
   else {
-    setBacklight(0, 255, 0);
+    setBacklight(0, 255, 0);  //set backlight to green
+    _lcd->setCursor(0, 0);
+    _lcd->print("Alert: NONE         ");
   }
 
   _lcd->setCursor(8, 1);
@@ -75,43 +79,14 @@ void AlarmDisplay::update(Alarm *alarm, float pip, float peep, float pp) {
 }
 
 void AlarmDisplay::IHoldMessage() {
-  // _lcd->clear();
-  setBacklight(0, 128, 128); // set blue-green color for display
-
-  _lcd->setCursor(0, 1);
+  _lcd->setCursor(0, 0);
   _lcd->print(_ihold_lines[0]);
-
-  _lcd->setCursor(0,2);
-  _lcd->print(_ihold_lines[1]);
-}
-
-void AlarmDisplay::startIHold() {
-  // _lcd->clear();
-  setBacklight(0, 128, 128); // set blue-green color for display
-
-  _lcd->setCursor(0,0);
-  _lcd->print(_ihold_lines[2]);
-
-  _lcd->setCursor(0, 1);
-  _lcd->print(_ihold_lines[3]);
-
-  _lcd->setCursor(15, 1);
-  _lcd->print(_ihold_lines[6]);
-
-  _lcd->setCursor(0, 2);
-  _lcd->print(_ihold_lines[4]);
-
-  _lcd->setCursor(15, 2);
-  _lcd->print(_ihold_lines[6]);
-
-  _lcd->setCursor(0, 3);
-  _lcd->print(_ihold_lines[5]);
-
-  _lcd->setCursor(15, 3);
-  _lcd->print(_ihold_lines[6]);
 }
 
 void AlarmDisplay::updateIHold (float pip, float peep, float pp) {
+  _lcd->setCursor(0, 0);
+  _lcd->print(_ihold_lines[1]);
+
   _lcd->setCursor(8, 1);
   _lcd->print(_pip);
 
@@ -142,4 +117,14 @@ void AlarmDisplay::setBacklight(uint8_t r, uint8_t g, uint8_t b) {
   analogWrite(_red_pin, r);
   analogWrite(_green_pin, g);
   analogWrite(_blue_pin, b);
+}
+
+// try not to use this function of _lcd->clear() as it causes the screen to flicker upon update
+void AlarmDisplay::clearOneLine(uint8_t row_pos) {
+  // set cursor at beginning of row. 
+  _lcd->setCursor(0,row_pos);
+  // print a row of spaces
+  for (uint8_t i=0; i<20; i++) {
+    _lcd->print(" ");
+  }
 }

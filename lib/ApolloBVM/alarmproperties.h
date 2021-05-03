@@ -8,7 +8,8 @@
 
 typedef struct {
   // variables for pressure sensor on expiratory limb
-  float max_pip; //35 cmH2O
+  float max_pip;  //35 cmH2O
+  float min_peep; //3 cmH2O OR 5 cmH2O
   float pip;
   float peep;
   float pp;
@@ -16,6 +17,18 @@ typedef struct {
   // variables for flow sensor on inspiratory limb
   float inspiratoryVolume;
 } SensorParameters;
+
+typedef struct {
+  const uint8_t signalDuration;
+  unsigned long iholdInitTime;
+  bool signalSent;
+
+  bool iHmessageDisplayed;
+
+  const uint8_t displayDuration;  //display for 2000 ms. 
+  unsigned long iholdMsgStart;
+  bool iHoldDisplay;
+} IHoldParameters;
 
 class AlarmIO {
 
@@ -39,15 +52,15 @@ public:
   float ipProcess() {
     return pressure_input.ipProcess();
   }
+  
+  //process end expiratory pressure
+  float epProcess() {
+    return pressure_input.epProcess();
+  }
 
   //process plateau pressure
   float ppProcess() {
     return pressure_input.ppProcess();
-  }
-
-  //process end expiratory pressure
-  float epProcess() {
-    return pressure_input.epProcess();
   }
 };
 

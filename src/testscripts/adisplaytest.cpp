@@ -9,18 +9,15 @@
 #define F2_TO_F1 2
 #define F1_TO_F2 13
 
-unsigned long iholdInitTime;
-const uint8_t pulseDuration = 100;
-bool signalSent;
-
 AlarmIO aio;
 
-SensorParameters sp = {35, 0, 0, 0, 0}; //initialize all parameters
+//initialize all parameters.
+SensorParameters sp = {35, 3, 0, 0, 0, 0}; 
+IHoldParameters ip = {100, 0, false, false, 2, 0, false};
+ 
 AlarmDisplay ad(RS, EN, D4, D5, D6, D7, RED_LIGHT, GREEN_LIGHT, BLUE_LIGHT);
 AlarmManager am(aio, 3);          //passing reference to aio.
 PressureManager pm(PS_Vout);      //initialize with pressure pin input
-
-
 
 void setup() {
   Serial.begin(9600);
@@ -28,30 +25,26 @@ void setup() {
   // Congifure pinMode for communicating F2 <-> F1;
   pinMode(F2_TO_F1, OUTPUT);
   pinMode(F1_TO_F2, INPUT);
-
-  signalSent = false;
   
   ad.warning();
   ad.start();
 
   am.addAlarm(0, [](AlarmIO &aio) {
         //change this "condition" to say flow less than 0 when flow sensor is included on the inspiratory circuit. 
-        sp.inspiratoryVolume < 0; //if peak inspiratory pressure is less than 0
-        return true;
+        return sp.inspiratoryVolume < 0; //if peak inspiratory pressure is less than 0
       },
-      "Alert: Awake"); 
+      "Alert: Awake        "); 
 
   am.addAlarm(1, [](AlarmIO &aio) {
-        sp.pip > sp.max_pip;
-        return true;
+        return sp.pip > sp.max_pip;
       },
-      "Alert: High Insp P"); 
+      "Alert: High Insp P  "); 
 
   am.addAlarm(2, [](AlarmIO &aio) {
         //function to get expiratory pressure reading
-        return false;
+        return sp.peep < sp.min_peep;
       },
-      "Alert: Low Exp P");
+      "Alert: Low Exp P    ");
 
   aio.calibrate();
 }
@@ -60,42 +53,58 @@ void loop() {
   // Poll I-Hold button state AND pressure sensor
   aio.poll();
 
+  //SIGNAL TO F2
   if (aio.ihold_button.getButtonState() == true) {
-    iholdInitTime = millis(); //read the time once then each iteration check the time and digitalWrite high
+    ip.iholdInitTime = millis(); 
     digitalWrite(F2_TO_F1, HIGH);
-    signalSent = true;
-    // ad.IHoldMessage();
-    //write method to clear display without using clear display? maybe just used _lcd->start() after certain amt of time.
+    ip.signalSent = true;
+    ip.iHmessageDisplayed = true;
+    ad.IHoldMessage();
   }
   else {
-    if (signalSent)  {
-      if (millis() - iholdInitTime > pulseDuration) {
-        signalSent = false;
+    if (ip.signalSent) {
+      //only when I-Hold is initiated, monitor time to send long signal
+      if (millis() - ip.iholdInitTime > ip.signalDuration)
+      {
+        ip.signalSent = false;
         digitalWrite(F2_TO_F1, LOW);
       }
     }
     else {
       digitalWrite(F2_TO_F1, LOW);
-      Serial.println("eh");
     }
   }
 
-  // sp.pip = aio.ipProcess();
-  // sp.peep = aio.epProcess();
-  
-  // if (digitalRead(F1_TO_F2) == HIGH) {
-  //   ad.startIHold();
-  //   sp.pp = aio.ppProcess();
-  // }
-  // else {
-  //   // when the signal turns off, replace with this panel
-  //   ad.updateIHold(sp.pip, sp.peep, sp.pp);
-  // }
- 
-  // Alarm *triggered_alarm = am.evaluate(); 
-  
-  
-  // ad.update(triggered_alarm, sp.pip, sp.peep, sp.pp);
-}
+  //PROCESS PRESSURE SENSOR DATA
+  sp.pip = aio.ipProcess();
+  sp.peep = aio.epProcess();
+  //READ SIGNAL FROM F1
+  if (digitalRead(F1_TO_F2) == HIGH) {
+    //process plateau pressure ONLY if in ihold manuever status
+    //NOTE TO SELF: FIGURE OUT HOW TO CALCULATE THIS.
+    sp.pp = aio.ppProcess();
+    ip.iHmessageDisplayed = false;
+    ip.iHoldDisplay = true;
+    ip.iholdMsgStart = millis();
+  }
+
+  //UPDATE DISPLAY
+  if (ip.iHmessageDisplayed) {
+      ad.IHoldMessage();
+  }
+  else if (ip.iHoldDisplay) {
+    //for 1 breath cycle, do not evaluate alarms, update display with patient parameters only. 
+    ad.updateIHold(sp.pip, sp.peep, sp.pp);
+    if (millis() - ip.iholdMsgStart > (ip.displayDuration*1000)) {
+      ip.iHoldDisplay = false;
+    }
+  }
+  else {
+      //evaluate alarms each cycle
+      Alarm *triggered_alarm = am.evaluate();
+      //update display with alarm status and patient parameters
+      ad.update(triggered_alarm, sp.pip, sp.peep, sp.pp);
+  }
+} //end of loop
 
 #endif
