@@ -7,6 +7,10 @@ PressureManager::PressureManager(uint8_t pressure_pin) : _pressure_pin(pressure_
 
 void PressureManager::calibrate() {
     //intialize sensor buffer with buffer length
+    for (uint16_t i = 0; i < _bufferLength; i++) {
+        sb.putBack(0);
+    }
+    
     _EMA_S_low = analogRead(_pressure_pin);
     _baseline = _EMA_S_low;
     _previousRead = millis();

@@ -90,7 +90,7 @@ void loop() {
 
   //UPDATE DISPLAY
   if (ip.iHmessageDisplayed) {
-      ad.IHoldMessage();
+    ad.IHoldMessage();
   }
   else if (ip.iHoldDisplay) {
     //for 1 breath cycle, do not evaluate alarms, update display with patient parameters only. 
