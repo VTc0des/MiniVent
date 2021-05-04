@@ -2,7 +2,7 @@
 
 ### Rice University - Global Medical Innovation & Oshman Engineering Design Kitchen
 
-###### Author: Varsha Thomas, Thomas Herring
+###### Authors: Varsha Thomas, Thomas Herring
 
 This repository contains all the working code for the MAIN, follower1 (F1), and follower2 (F2) Arduino UNO microcontrollers to build the MiniVent device, a low-cost pediatric bridge ventilator. Feel free to fork it for your own development, we encourage collaboration! All mechanical parts and assembly instructions to build the predicate device (ApolloBVM - the adult bridge ventilator) can be found [here](http://oedk.rice.edu/apollobvm), a bill of materials, and a slide deck can be found in the google drive supplied by the 2020-2021 BIOE 530 Design Team
 
