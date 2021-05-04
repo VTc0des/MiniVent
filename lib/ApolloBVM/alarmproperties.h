@@ -48,6 +48,10 @@ public:
     pressure_input.poll();
   }
 
+  void iholdPoll() {
+    pressure_input.iholdPoll();
+  }
+
   //process inspiratory pressure
   float ipProcess() {
     return pressure_input.ipProcess();

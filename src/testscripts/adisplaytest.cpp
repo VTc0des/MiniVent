@@ -13,7 +13,7 @@ AlarmIO aio;
 
 //initialize all parameters.
 SensorParameters sp = {35, 3, 0, 0, 0, 0}; 
-IHoldParameters ip = {100, 0, false, false, 2, 0, false};
+IHoldParameters ip = {100, 0, false, false, 5, 0, false};
  
 AlarmDisplay ad(RS, EN, D4, D5, D6, D7, RED_LIGHT, GREEN_LIGHT, BLUE_LIGHT);
 AlarmManager am(aio, 3);          //passing reference to aio.
@@ -80,24 +80,29 @@ void loop() {
   sp.peep = aio.epProcess();
   //READ SIGNAL FROM F1
   if (digitalRead(F1_TO_F2) == HIGH) {
-    //process plateau pressure ONLY if in ihold manuever status
-    //NOTE TO SELF: FIGURE OUT HOW TO CALCULATE THIS.
-    sp.pp = aio.ppProcess();
+    aio.iholdPoll();
+
+    //these variables will constantly be updated while the signal is high. the last state that it saves is the moment before the signal writes low. 
     ip.iHmessageDisplayed = false;
     ip.iHoldDisplay = true;
     ip.iholdMsgStart = millis();
   }
 
   //UPDATE DISPLAY
-  if (ip.iHmessageDisplayed) {
-    ad.IHoldMessage();
-  }
-  else if (ip.iHoldDisplay) {
-    //for 1 breath cycle, do not evaluate alarms, update display with patient parameters only. 
+  if (ip.iHoldDisplay) {
+    //if ihold maneuver completed, the calculate plateau pressure
+    if (digitalRead(F1_TO_F2) == LOW) {
+      sp.pp = aio.ppProcess();
+    }
+
     ad.updateIHold(sp.pip, sp.peep, sp.pp);
-    if (millis() - ip.iholdMsgStart > (ip.displayDuration*1000)) {
+
+    if (millis() - ip.iholdMsgStart > (ip.displayDuration*100)) {
       ip.iHoldDisplay = false;
     }
+  }
+  else if (ip.iHmessageDisplayed) {
+    ad.IHoldMessage();
   }
   else {
       //evaluate alarms each cycle
@@ -105,6 +110,7 @@ void loop() {
       //update display with alarm status and patient parameters
       ad.update(triggered_alarm, sp.pip, sp.peep, sp.pp);
   }
+
 } //end of loop
 
 #endif

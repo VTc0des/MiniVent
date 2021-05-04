@@ -1,4 +1,4 @@
-#ifdef SBTST
+#ifdef PMTST
 #include <Arduino.h>
 #include "alarmproperties.h"
 
@@ -19,7 +19,6 @@ void setup() {
 
 void loop() {
   aio.poll(); 
-  pip = aio.process();
 }
 
 #endif

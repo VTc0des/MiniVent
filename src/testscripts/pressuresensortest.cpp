@@ -53,6 +53,7 @@ float max_pip = 35; //35 cmH2O
 //const String display_lines[3] = {"PIP = ", "PEEP = ", "PP = "};
 
 void printWarning();
+void startDisplay();
 void read_filter();
 void calculatePIP();
 void displayPIP();
@@ -95,6 +96,7 @@ void loop()
   if (i == SAMPLE_SIZE)
   {
     i = 0; //reset i to 0.
+    Serial.println("CALCULATING");
     calculatePIP();
     displayPIP();
   }
@@ -151,7 +153,7 @@ void read_filter() {
 
 void calculatePIP() {
   int maxValue = savePressure[0]; //save first value in array
-  for (uint8_t j = 1; j < SAMPLE_SIZE; j++) {
+  for (uint8_t j = 0; j < SAMPLE_SIZE; j++) {
     if (savePressure[j] > maxValue) {
       maxValue = savePressure[j];
     }
@@ -161,7 +163,8 @@ void calculatePIP() {
   //  Serial.println(maxValue);
   //  Serial.print("ADC PIP Value ");
   //  Serial.println((maxValue - baseline));
-
+  Serial.print("mx value,");
+  Serial.println(maxValue - baseline);
   //convert to voltage output, then to mBar, then to cmH2O
   pip = ((maxValue - baseline) * 100 * mBar_cmH2O) / 1023;
 //  pip = (maxValue * 100 * mBar_cmH2O) / 1023;

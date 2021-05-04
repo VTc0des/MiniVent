@@ -21,7 +21,7 @@ public:
 private:
   const String _warning_lines[4] = {"MINIVENT", "WARNING:", "USE PEDI SIZED", "BAG VALVE MASK"};
   const String _display_lines[4] = {"PIP  = ", "PEEP = ", "PP   = ", "cmH2O"};
-  const String _ihold_lines[2] = {"I-HOLD INITIATED    ", "I-HOLD PARAMETERS   "};
+  const String _ihold_lines[2] = {"I-HOLD INITIATED    ", "WAIT FOR PARAMETERS "};
   const uint8_t _cols = 20;
   const uint8_t _rows = 4;
   const uint8_t _brightness = 255;

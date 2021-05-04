@@ -65,17 +65,17 @@ void AlarmDisplay::update(Alarm *alarm, float pip, float peep, float pp) {
   else {
     setBacklight(0, 255, 0);  //set backlight to green
     _lcd->setCursor(0, 0);
-    _lcd->print("Alert: NONE         ");
+    _lcd->print("Alert: None         ");
   }
 
   _lcd->setCursor(8, 1);
-  _lcd->print(_pip);
+  _lcd->print(String(_pip));
 
   _lcd->setCursor(8, 2);
-  _lcd->print(_peep);
+  _lcd->print(String(_peep));
 
   _lcd->setCursor(8, 3);
-  _lcd->print(_pp);
+  _lcd->print(String(_pp));
 }
 
 void AlarmDisplay::IHoldMessage() {
@@ -88,13 +88,13 @@ void AlarmDisplay::updateIHold (float pip, float peep, float pp) {
   _lcd->print(_ihold_lines[1]);
 
   _lcd->setCursor(8, 1);
-  _lcd->print(_pip);
+  _lcd->print(String(_pip));
 
   _lcd->setCursor(8, 2);
-  _lcd->print(_peep);
+  _lcd->print(String(_peep));
 
   _lcd->setCursor(8, 3);
-  _lcd->print(_pp);
+  _lcd->print(String(_pp));
 }
 
 void AlarmDisplay::setBacklight(uint8_t r, uint8_t g, uint8_t b) {
