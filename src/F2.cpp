@@ -1,246 +1,111 @@
 #ifdef ALM
+
 #include <Arduino.h>
 #include "Wire.h"
-#include "ventproperties.h"
-#include "panel.h"
+#include "alarmdisplay.h"
+#include "alarmproperties.h"    //include alarmdisplay.h and alarmproperties.h separetly to avoid cyclic inclusion of libraries. 
 
-// Initialize ventilator state object.
-VentIO vio;
+AlarmIO aio;
 
-//Initialize alarm settings object
-AlarmSettings as = {false, false, false, 0, 0, 0};
+//initialize all parameters.
+SensorParameters sp = {35, 3, 0, 0, 0, 0}; 
+IHoldParameters ip = {100, 0, false, false, 5, 0, false};
+ 
+AlarmDisplay ad(RS, EN, D4, D5, D6, D7, RED_LIGHT, GREEN_LIGHT, BLUE_LIGHT);
+AlarmManager am(aio, 3);          //passing reference to aio.
+PressureManager pm(PS_Vout);      //initialize with pressure pin input
 
-//Initialize sensor state object
-SensorParameters sp = {0,0,0};
+void setup() {
+  Serial.begin(9600);
+  
+  // Congifure pinMode for communicating F2 <-> F1;
+  pinMode(F2_TO_F1, OUTPUT);
+  pinMode(F1_TO_F2, INPUT);
+  
+  ad.warning();
+  ad.start();
 
-//initialize time constants
-TimeConsts tc  = {0,0,0,0,0,0,0,0, 10000, 500, 4000}; 
+  am.addAlarm(0, [](AlarmIO &aio) {
+        //change this "condition" to say flow less than 0 when flow sensor is included on the inspiratory circuit. 
+        return sp.inspiratoryVolume < 0; //if peak inspiratory pressure is less than 0
+      },
+      "Alert: Awake        "); 
 
-LiquidCrystal lcd(RS, EN, D4, D5, D6, D7);
-int brightness = 255;
-String warning[3] = {"      MiniVent", "    ALARM PANEL", "CHECK SENSOR MODULE."};
-String displayParams[3] = {"PIP = ", "PEEP = ", "PP = "};
+  am.addAlarm(1, [](AlarmIO &aio) {
+        return sp.pip > sp.max_pip;
+      },
+      "Alert: High Insp P  "); 
 
-//declare all functions
-void printWarning();
-void setBacklight(uint8_t r, uint8_t g, uint8_t b);
-void readPressure();
-void ihold();
-void algorithm();
-void indicateLED();
-void displayAlert();
-void updateDisplay();
+  am.addAlarm(2, [](AlarmIO &aio) {
+        //function to get expiratory pressure reading
+        return sp.peep < sp.min_peep;
+      },
+      "Alert: Low Exp P    ");
 
-void setup ()    
-{
-    Serial.begin(9600);
-    
-    //set LED pins as outputs
-    vio.LED(); 
-    printWarning();
-    //CALIBRATE
+  aio.calibrate();
 }
 
-void loop ()
-{
-    // //poll button for I-HOLD input
-    // vio.ihold_button.poll();
+void loop() {
+  // Poll I-Hold button state AND pressure sensor
+  aio.poll();
 
-    // //if button pushed
-    // if (vio.ihold_button.getButtonState())
-    // {
-    //     //send signal to master microcontroller
-    //     analogWrite(ihold_main, 255); //send high signal to master
-    //     //if signal comes back from master indicating the 
-    //     //motors are at the beginning of the inspiratory cycle go to the function
-    //     if (map(analogRead(ihold_alarm), 0, 1023, 0, 255))
-    //     {
-    //         ihold();
-    //     } 
-    // }
-    // else {
-    //     analogWrite(ihold_main, 0); //send 0 to indicate no button push
-    // }
-
-    // //read for set amount of time.
-    // readPressure();
-
-    // /*tc.currihold = millis(); //take current time. 
-    // if (tc.currihold - tc.previhold >= tc.inspHold)
-    // {
-    //     tc.previhold = tc.currihold;
-    //     readPressure();
-    // }*/
-}
-
-void printWarning()
-{
-    lcd.clear();
-    setBacklight(0,128,128); //set blue-green color for display
-    for (int i = 0; i < 3; i++)
-    {
-        lcd.setCursor(0, i+1);
-        lcd.print(warning[i]);
+  //SIGNAL TO F1
+  if (aio.ihold_button.getButtonState() == true) {
+    ip.iholdInitTime = millis(); 
+    digitalWrite(F2_TO_F1, HIGH);
+    ip.signalSent = true;
+    ip.iHmessageDisplayed = true;
+    ad.IHoldMessage();
+  }
+  else {
+    if (ip.signalSent) {
+      //only when I-Hold is initiated, monitor time to send long signal
+      if (millis() - ip.iholdInitTime > ip.signalDuration)
+      {
+        ip.signalSent = false;
+        digitalWrite(F2_TO_F1, LOW);
+      }
     }
-    
-    delay(tc.displayTime); //display for 2 seconds
-    lcd.clear();
-}
-
-void setBacklight(uint8_t r, uint8_t g, uint8_t b)
-{
-    // normalize the red LED - its brighter than the rest!
-    r = map(r, 0, 255, 0, 100);
-    g = map(g, 0, 255, 0, 150);
-
-    r = map(r, 0, 255, 0, brightness);
-    g = map(g, 0, 255, 0, brightness);
-    b = map(b, 0, 255, 0, brightness);
-
-    // common anode so invert!
-    r = map(r, 0, 255, 255, 0);
-    g = map(g, 0, 255, 255, 0);
-    b = map(b, 0, 255, 255, 0);
-
-    analogWrite(RED_LIGHT, r);
-    analogWrite(GREEN_LIGHT, g);
-    analogWrite(BLUE_LIGHT, b);
-}
-
-void readPressure()
-{
-    algorithm();
-}
-
-void ihold()
-{
-    lcd.clear();
-    setBacklight(0,128,128); //set blue-green color for display
-    lcd.setCursor(0, 1);
-    lcd.print(" I-HOLD IN PROGRESS");
-    //while (inspiratory hold period not complete.)
-    //{
-
-    //}
-    readPressure();
-    //turn flags on for testing. 
-}
-
-void algorithm()
-{
-    //smooth data
-    //find where concave for PIP 
-    //find where convex for PEEP
-    //save the PIP and PEEP value into a variable
-    //raise flag if PIP, PEEP and breathing initated exceed the appropriate threshold 
-    
-    //if you have found PIP, PEEP etc. then send to indicateLED();
-    indicateLED();
-}
-
-void indicateLED()
-{
-    if (as.highP)
-    { //turn on hgih pressure LED
-        digitalWrite(ALM_HIGH, HIGH);
+    else {
+      digitalWrite(F2_TO_F1, LOW);
     }
-    else
-    { //turn off LED if clear
-        digitalWrite(ALM_HIGH, LOW);
+  }
+
+  //PROCESS PRESSURE SENSOR DATA
+  sp.pip = aio.ipProcess();
+  sp.peep = aio.epProcess();
+  //READ SIGNAL FROM F1
+  if (digitalRead(F1_TO_F2) == HIGH) {
+    aio.iholdPoll();
+
+    //these variables will constantly be updated while the signal is high. the last state that it saves is the moment before the signal writes low. 
+    ip.iHmessageDisplayed = false;
+    ip.iHoldDisplay = true;
+    ip.iholdMsgStart = millis();
+  }
+
+  //UPDATE DISPLAY
+  if (ip.iHoldDisplay) {
+    //if ihold maneuver completed, the calculate plateau pressure
+    if (digitalRead(F1_TO_F2) == LOW) {
+      sp.pp = aio.ppProcess();
     }
 
-    if (as.lowP)
-    { //turn on low pressure LED
-        digitalWrite(ALM_LOW, HIGH);
-    }
-    else
-    { //turn off LED if clear
-        digitalWrite(ALM_LOW, LOW);
-    }
+    ad.updateIHold(sp.pip, sp.peep, sp.pp);
 
-    if (as.insp)
-    { //turn on inspiraotry pressure detected LED
-        digitalWrite(ALM_INSP, HIGH);
+    if (millis() - ip.iholdMsgStart > (ip.displayDuration*100)) {
+      ip.iHoldDisplay = false;
     }
-    else
-    { //turn off LED if clear
-        digitalWrite(ALM_INSP, LOW);
-    }
-
-    if (as.highP || as.lowP || as.insp)
-    { //turn backlight to RED if any flags are still active
-        setBacklight(255, 0, 0);
-    }
-    else
-    { //turn backlight to gree if all is normal
-        setBacklight(0, 255, 0);
-    }
-
-    displayAlert();
-    updateDisplay();
-}
-
-void displayAlert()
-{
-    lcd.clear();
-    if (as.highP)
-    {
-        lcd.setCursor(0, 0);
-        lcd.print("   ALERT: HIGH IP");
-    }
-    if (as.lowP)
-    {
-        lcd.setCursor(0, 0);
-        lcd.print(" ALERT: HIGH PEEP");
-    } //turn on greenbacklight
-
-    if (as.insp)
-    {
-        lcd.setCursor(0, 0);
-        lcd.print(" ALERT:INDP. BREATH");
-    }
-    //if no flags are activated
-    if (!as.highP && !as.lowP && !as.insp)
-    {
-        lcd.setCursor(0, 0);
-        lcd.print("     NO ALERTS");
-    }
-}
-
-void updateDisplay()
-{
-    //print all statements
-    for (int i = 0; i < 3; i++)
-    {
-        lcd.setCursor(0, i+1);
-        switch (i)
-        {
-        case 0:
-            lcd.print(displayParams[i]);
-            break;
-        case 1:
-            lcd.print(displayParams[i]);
-            break;
-        case 2:
-            lcd.print(displayParams[i]);
-            break;
-        }
-
-        lcd.setCursor(8, i+1);
-        switch (i)
-        {
-        case 0:
-            lcd.print(sp.inspiratoryPressure);
-            break;
-        case 1:
-            lcd.print(sp.expiratoryPressure);
-            break;
-        case 2:
-            lcd.print(sp.plateauPressure);
-            break;
-        }
-    }
-    delay(tc.displayTime); //display for 2 seconds
-}
+  }
+  else if (ip.iHmessageDisplayed) {
+    ad.IHoldMessage();
+  }
+  else {
+      //evaluate alarms each cycle
+      Alarm *triggered_alarm = am.evaluate();
+      //update display with alarm status and patient parameters
+      ad.update(triggered_alarm, sp.pip, sp.peep, sp.pp);
+  }
+} //end of loop
 
 #endif

@@ -7,7 +7,7 @@
 VentIO vio;
 
 // Default settings.
-VentSettings vs = {'X', 180, 25, 1, 3, 0, 00, 20, 0, 0, 0, false, false}; 
+VentSettings vs = {'X', 200, 25, 1, 3, 0, 00, 20, 0, 0, 0, false, false}; 
 
 // Default limits.
 VentLimits vl;

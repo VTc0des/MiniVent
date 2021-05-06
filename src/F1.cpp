@@ -130,7 +130,6 @@ void loop() {
     // if signal recieved from F2 AND not already in C, I, L, or X states (confirm, initiate, load, stop)
     // set the state to C to confirm ihold
     state = 'C';  
-    Serial.println("I-Hold Request Confirmed");
   } 
 
   // Run device in different modes.
