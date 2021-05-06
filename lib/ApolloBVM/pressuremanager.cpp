@@ -30,7 +30,7 @@ void PressureManager::calibrate() {
 }
 
 void PressureManager::poll() {
-    if (_counter == 0) {
+    if (_counter < _finalidx) {
         _processFlag = false;
     }
     else if (_counter == _finalidx) {
@@ -92,7 +92,7 @@ void PressureManager::iholdPoll() {
     Serial.println(_plateauArray[_iholdCounter]);
 }
 
-float PressureManager::ipProcess() {
+double PressureManager::ipProcess() {
     if (_processFlag) {
         _maxInspVal =_pressureArray[0]; //save the first value in the array to compare. 
         
@@ -110,14 +110,14 @@ float PressureManager::ipProcess() {
     }
 }
 
-float PressureManager::epProcess() {
+double PressureManager::epProcess() {
     if (_processFlag) {
         //do things to find this value and return the updated value. 
         return _peep;
     }
 }
 
-float PressureManager::ppProcess() {
+double PressureManager::ppProcess() {
 
     //blocking statement but this should be relatively fast to not miss much data
     for (uint8_t i = 1; i < (_ihold_bufferLength - 1); i++) {

@@ -11,17 +11,17 @@ public:
     void calibrate(); 
     void poll(); 
     void iholdPoll();
-    float ipProcess();
-    float epProcess();
-    float ppProcess();
+    double ipProcess();
+    double epProcess();
+    double ppProcess();
 
 private:
     const uint8_t _sample_rate = 20;        //poll for a new pressure sample every 20 ms
     const uint8_t _ihold_sample_rate = 10;  //ihold poll is faster to try to grab more data points. 
     const uint8_t _bufferLength = BUFFER_LENGTH;
     const uint8_t _ihold_bufferLength = IHOLD_BUFFER_LENGTH;
-    const float _mBar_cmH2O = 1.02; //conversion factor from mBar to cmH2O to display to the screen with 2 significant decimal places.  actual value = 1.01972
-    const float _EMA_a_low = 0.7;   //initialization of EMA alpha
+    const double _mBar_cmH2O = 1.02; //conversion factor from mBar to cmH2O to display to the screen with 2 significant decimal places.  actual value = 1.01972
+    const double _EMA_a_low = 0.7;   //initialization of EMA alpha
 
     //pin location for the pressure sensor.
     uint8_t _pressure_pin;
@@ -46,10 +46,10 @@ private:
     unsigned long _currentRead;
     unsigned long _previousRead;
 
-    float _pip = 0.0;
-    float _peep = 3.0;      //set to 3 during testing to avoid setting off low peep alarm. 
+    double _pip = 0.0;
+    double _peep = 3.0;      //set to 3 during testing to avoid setting off low peep alarm. 
     // float _peep = 0.0;   //uncomment ln 40 and comment ln 39 once _peep functionality is implemented
-    float _pp = 0.0;
+    double _pp = 0.0;
 };
 
 #endif

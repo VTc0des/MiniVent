@@ -41,7 +41,7 @@ typedef struct {
 typedef struct {
 
   int min_tidal_volume = 100;
-  int max_tidal_volume = 700;
+  int max_tidal_volume = 360;
   int delta_tidal_volume = 50;
 
   int min_respiration_rate = 10;

@@ -8,14 +8,14 @@
 
 typedef struct {
   // variables for pressure sensor on expiratory limb
-  float max_pip;  //35 cmH2O
-  float min_peep; //3 cmH2O OR 5 cmH2O
-  float pip;
-  float peep;
-  float pp;
+  double max_pip;  //35 cmH2O
+  double min_peep; //3 cmH2O OR 5 cmH2O
+  double pip;
+  double peep;
+  double pp;
 
   // variables for flow sensor on inspiratory limb
-  float inspiratoryVolume;
+  double inspiratoryVolume;
 } SensorParameters;
 
 typedef struct {
@@ -53,17 +53,17 @@ public:
   }
 
   //process inspiratory pressure
-  float ipProcess() {
+  double ipProcess() {
     return pressure_input.ipProcess();
   }
   
   //process end expiratory pressure
-  float epProcess() {
+  double epProcess() {
     return pressure_input.epProcess();
   }
 
   //process plateau pressure
-  float ppProcess() {
+  double ppProcess() {
     return pressure_input.ppProcess();
   }
 };

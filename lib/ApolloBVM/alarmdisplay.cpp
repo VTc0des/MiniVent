@@ -2,8 +2,8 @@
 
 AlarmDisplay::AlarmDisplay(uint8_t rs, uint8_t enable, uint8_t d0, uint8_t d1,
                            uint8_t d2, uint8_t d3, uint8_t red, uint8_t green, uint8_t blue)
-    : _red_pin(red), _green_pin(green), _blue_pin(blue), _pip(0), _peep(0),
-      _pp(0) {
+    : _red_pin(red), _green_pin(green), _blue_pin(blue), _pip(0.0), _peep(0.0),
+      _pp(0.0) {
   _lcd = new LiquidCrystal(rs, enable, d0, d1, d2, d3);
 }
 
@@ -52,11 +52,12 @@ void AlarmDisplay::start() {
 
 }
 
-void AlarmDisplay::update(Alarm *alarm, float pip, float peep, float pp) {
+void AlarmDisplay::update(Alarm *alarm, double pip, double peep, double pp) {
+  // convert to strings
   _pip = pip;
   _peep = peep;
   _pp = pp;
-    
+
   if (alarm != 0) {
     setBacklight(255, 0, 0);  //set backlight to red
     _lcd->setCursor(0, 0);
@@ -69,13 +70,13 @@ void AlarmDisplay::update(Alarm *alarm, float pip, float peep, float pp) {
   }
 
   _lcd->setCursor(8, 1);
-  _lcd->print(String(_pip));
+  _lcd->print(_pip);
 
   _lcd->setCursor(8, 2);
-  _lcd->print(String(_peep));
+  _lcd->print(_peep);
 
   _lcd->setCursor(8, 3);
-  _lcd->print(String(_pp));
+  _lcd->print(_pp);
 }
 
 void AlarmDisplay::IHoldMessage() {
@@ -83,25 +84,26 @@ void AlarmDisplay::IHoldMessage() {
   _lcd->print(_ihold_lines[0]);
 }
 
-void AlarmDisplay::updateIHold (float pip, float peep, float pp) {
+void AlarmDisplay::updateIHold (double pip, double peep, double pp) {
+  // convert to strings
+  _pip = pip;
+  _peep = peep;
+  _pp = pp;
+
   _lcd->setCursor(0, 0);
   _lcd->print(_ihold_lines[1]);
 
   _lcd->setCursor(8, 1);
-  _lcd->print(String(_pip));
+  _lcd->print(_pip);
 
   _lcd->setCursor(8, 2);
-  _lcd->print(String(_peep));
+  _lcd->print(_peep);
 
   _lcd->setCursor(8, 3);
-  _lcd->print(String(_pp));
+  _lcd->print(_pp);
 }
 
 void AlarmDisplay::setBacklight(uint8_t r, uint8_t g, uint8_t b) {
-  // normalize the red LED - its brighter than the rest!
-  // r = map(r, 0, 255, 0, 100);
-  // g = map(g, 0, 255, 0, 150);
-
   r = map(r, 0, 255, 0, 255);
   g = map(g, 0, 255, 0, 255);
 

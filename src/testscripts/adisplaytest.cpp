@@ -53,7 +53,7 @@ void loop() {
   // Poll I-Hold button state AND pressure sensor
   aio.poll();
 
-  //SIGNAL TO F2
+  //SIGNAL TO F1
   if (aio.ihold_button.getButtonState() == true) {
     ip.iholdInitTime = millis(); 
     digitalWrite(F2_TO_F1, HIGH);
@@ -110,7 +110,6 @@ void loop() {
       //update display with alarm status and patient parameters
       ad.update(triggered_alarm, sp.pip, sp.peep, sp.pp);
   }
-
 } //end of loop
 
 #endif

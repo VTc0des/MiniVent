@@ -12,9 +12,9 @@ public:
 
   void warning();
   void start();
-  void update(Alarm *alarm, float pip, float peep, float pp);
+  void update(Alarm *alarm, double pip, double peep, double pp);
   void IHoldMessage();
-  void updateIHold(float pip, float peep, float pp);
+  void updateIHold(double pip, double peep, double pp);
   void setBacklight(uint8_t r, uint8_t g, uint8_t b);
   void clearOneLine(uint8_t row_pos);
 
@@ -32,11 +32,10 @@ private:
   uint8_t _green_pin;
   uint8_t _blue_pin;
 
-  // variables to hold values that are outputted to the display
-  //put these floats in pressure manager, then pass them to the update functions
-  float _pip;
-  float _peep;
-  float _pp;
+  // variables to hold values that are recieved from pressure processing
+  double _pip;
+  double _peep;
+  double _pp;
 };
 
 #endif
